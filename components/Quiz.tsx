@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Question, UserResponse } from '../types';
 
 interface QuizProps {
@@ -18,53 +18,42 @@ const Quiz: React.FC<QuizProps> = ({ questions, onComplete }) => {
 
   const getResponse = (id: number) => responses.find(r => r.questionId === id);
 
-  const upsertResponse = (
-    baseResponses: UserResponse[],
-    questionId: number,
-    data: Partial<UserResponse>
-  ) => {
-    const newResponses = [...baseResponses];
-    const index = newResponses.findIndex(r => r.questionId === questionId);
+  const updateResponse = (data: Partial<UserResponse>) => {
+    const newResponses = [...responses];
+    const index = newResponses.findIndex(r => r.questionId === currentQuestion.id);
     if (index > -1) {
       newResponses[index] = { ...newResponses[index], ...data };
     } else {
-      newResponses.push({ questionId, ...data });
+      newResponses.push({ questionId: currentQuestion.id, ...data });
     }
-    return newResponses;
+    setResponses(newResponses);
   };
 
-  const handleSelect = (optionId: string) => {
-    setResponses(prev => upsertResponse(prev, currentQuestion.id, { selectedOptionId: optionId }));
-    if (currentQuestion.type === 'choice') {
-      setTimeout(() => handleNext(optionId), 400);
-    }
-  };
-
-  const handleNext = (forcedSelection?: string) => {
-    const selectedOption = forcedSelection || currentSelection;
-    const responsePatch: Partial<UserResponse> = {
-      ...(selectedOption ? { selectedOptionId: selectedOption } : {})
-    };
-
+  const handleNext = () => {
+    // Collect text values if any
     if (currentQuestion.type === 'text') {
-      responsePatch.textValue = currentText.trim();
+      updateResponse({ textValue: currentText });
     }
     if (currentQuestion.type === 'hybrid' && currentQuestion.followUpPrompt) {
-      responsePatch.followUpValue = currentFollowUp.trim();
+      updateResponse({ followUpValue: currentFollowUp });
     }
-
-    const nextResponses = upsertResponse(responses, currentQuestion.id, responsePatch);
-    setResponses(nextResponses);
 
     if (currentIndex < questions.length - 1) {
       const nextQ = questions[currentIndex + 1];
-      const nextRes = nextResponses.find(r => r.questionId === nextQ.id);
+      const nextRes = responses.find(r => r.questionId === nextQ.id);
       setCurrentText(nextRes?.textValue || '');
       setCurrentFollowUp(nextRes?.followUpValue || '');
       setCurrentIndex(currentIndex + 1);
     } else {
-      onComplete(nextResponses);
+      // Small buffer to ensure states are flushed
+      onComplete(responses);
     }
+  };
+
+  const handleSelect = (optionId: string) => {
+    updateResponse({ selectedOptionId: optionId });
+    // User requested auto-advance upon selection
+    setTimeout(handleNext, 400);
   };
 
   const handleBack = () => {
@@ -78,9 +67,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onComplete }) => {
   };
 
   const currentSelection = getResponse(currentQuestion.id)?.selectedOptionId;
-  const isComplete = currentQuestion.type === 'choice' ? !!currentSelection : 
-                     currentQuestion.type === 'text' ? currentText.trim().length > 5 :
-                     !!currentSelection; // Hybrid just needs selection for next
 
   return (
     <div className="flex flex-col h-[700px] bg-white">
@@ -94,10 +80,10 @@ const Quiz: React.FC<QuizProps> = ({ questions, onComplete }) => {
       <div className="p-8 sm:p-12 flex flex-col flex-grow overflow-hidden">
         <div className="flex justify-between items-center mb-8">
           <span className="text-slate-400 font-bold text-xs tracking-widest uppercase">
-            {currentIndex + 1} / {questions.length}
+            Question {currentIndex + 1} of {questions.length}
           </span>
           {currentIndex > 0 && (
-            <button onClick={handleBack} className="text-slate-400 hover:text-indigo-600 font-semibold text-xs transition-colors">
+            <button onClick={handleBack} className="text-slate-400 hover:text-indigo-600 font-semibold text-xs transition-colors px-2 py-1 rounded hover:bg-slate-50">
               ← BACK
             </button>
           )}
@@ -123,7 +109,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onComplete }) => {
                   onClick={() => handleSelect(option.id)}
                   className={`w-full text-left p-4 rounded-2xl border-2 transition-all flex items-center group
                     ${currentSelection === option.id 
-                      ? 'border-indigo-600 bg-indigo-50 text-indigo-700' 
+                      ? 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm' 
                       : 'border-slate-100 hover:border-slate-200 bg-white text-slate-600'
                     }`}
                 >
@@ -139,41 +125,37 @@ const Quiz: React.FC<QuizProps> = ({ questions, onComplete }) => {
           )}
 
           {currentQuestion.type === 'text' && (
-            <textarea
-              className="w-full h-40 p-6 rounded-2xl border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 outline-none transition-all text-slate-700 font-medium resize-none"
-              placeholder="Be honest. What was the signal everyone ignored?"
-              value={currentText}
-              onChange={(e) => setCurrentText(e.target.value)}
-            />
+            <div className="animate-fadeIn">
+              <textarea
+                className="w-full h-40 p-6 rounded-2xl border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 outline-none transition-all text-slate-700 font-medium resize-none mb-4"
+                placeholder="Be honest. What was the signal everyone ignored?"
+                value={currentText}
+                onChange={(e) => setCurrentText(e.target.value)}
+              />
+              <button 
+                onClick={handleNext}
+                disabled={currentText.trim().length < 5}
+                className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 disabled:bg-slate-100 disabled:text-slate-400 transition-all"
+              >
+                Continue →
+              </button>
+            </div>
           )}
 
           {currentQuestion.type === 'hybrid' && currentSelection && (
             <div className="mt-8 animate-fadeIn">
               <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">
-                {currentQuestion.followUpPrompt}
+                {currentQuestion.followUpPrompt} (Optional)
               </label>
               <input
                 className="w-full p-5 rounded-2xl border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 outline-none transition-all text-slate-700 font-medium"
-                placeholder="Optional explanation..."
+                placeholder="Brief nuance if you want..."
                 value={currentFollowUp}
                 onChange={(e) => setCurrentFollowUp(e.target.value)}
+                onBlur={handleNext} // Auto-advance when they move away from the optional follow-up
               />
             </div>
           )}
-        </div>
-
-        <div className="mt-8 flex justify-end">
-          <button
-            onClick={handleNext}
-            disabled={!isComplete}
-            className={`px-10 py-4 rounded-2xl font-bold transition-all
-              ${!isComplete 
-                ? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
-                : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-95'
-              }`}
-          >
-            {currentIndex === questions.length - 1 ? 'Finish Gauntlet' : 'Next Question →'}
-          </button>
         </div>
       </div>
     </div>

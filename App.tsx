@@ -2,6 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import { AppState, UserResponse, QuizResults, UserInfo } from './types';
 import { QUIZ_QUESTIONS } from './constants';
+import { analyzePMInstincts } from './geminiService';
 import { db } from './db';
 import Welcome from './components/Welcome';
 import UserDetailsForm from './components/UserDetailsForm';
@@ -28,16 +29,18 @@ const App: React.FC = () => {
     setResponses(finalResponses);
     setCurrentStep(AppState.ANALYZING);
     try {
-      if (!userInfo) {
-        throw new Error('Missing user information.');
+      const analysis = await analyzePMInstincts(finalResponses, userInfo?.name);
+      
+      // Save to "Database"
+      if (userInfo) {
+        await db.saveSubmission(userInfo, finalResponses, analysis);
       }
-      const analysis = await db.saveSubmission(userInfo, finalResponses);
 
       setResults(analysis);
       setCurrentStep(AppState.RESULTS);
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "Something went wrong analyzing your instincts. Please try again.");
+      setError("Something went wrong analyzing your instincts. Maybe the AI is jealous? Try again.");
       setCurrentStep(AppState.RESULTS);
     }
   }, [userInfo]);

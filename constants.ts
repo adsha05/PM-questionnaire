@@ -5,150 +5,153 @@ export const QUIZ_QUESTIONS: Question[] = [
   {
     id: 1,
     type: 'choice',
-    scenario: "You're PM at 'GrowthLabs' (B2B SaaS analytics). Month 18 snapshot: MRR $68k, Burn $195k, Runway 13m, Retention 72%, Growth 7% MoM, NPS 44, Team 21.",
+    scenario: "18-month-old B2B SaaS. MRR: $68K, Monthly Burn: $195K, 12-mo Retention: 72%, Growth: 7% MoM, NPS: 44. Team: 21.",
     question: "What stands out as the BIGGEST issue?",
     options: [
-      { id: 'a', text: "Retention is too low (72% is weak)" },
-      { id: 'b', text: "Burn rate relative to revenue (burning 2.9x revenue)" },
+      { id: 'a', text: "Retention is too low (72% is concerning for SaaS)" },
+      { id: 'b', text: "Burn rate is catastrophic (2.9x revenue)" },
       { id: 'c', text: "Growth is slowing (7% is below Series A expectations)" },
       { id: 'd', text: "NPS is mediocre (should be 50+)" },
-      { id: 'e', text: "No major issue (metrics are reasonable)" }
+      { id: 'e', text: "No major issue; metrics are reasonable" }
     ]
   },
   {
     id: 2,
     type: 'choice',
-    scenario: "You're PM at 'CloudSync' (enterprise file sync). Dropbox just launched a free enterprise competitor. Your churn increased from 2% to 3.5%. TAM is $12B (5% penetrated). 14 months runway.",
-    question: "What's your strategic priority for next quarter?",
+    scenario: "CloudSync (Enterprise file sync). Dropbox launches a free enterprise tier. Your churn jumps 2% → 3.5%. Runway: 14 months.",
+    question: "What is your strategic priority for next quarter?",
     options: [
       { id: 'a', text: "Double down on differentiation (unique features)" },
       { id: 'b', text: "Accelerate land-and-expand (upsell existing)" },
-      { id: 'c', text: "Reduce burn rate (extend runway)" },
-      { id: 'd', text: "Raise Series B ASAP (outspend competitors)" },
+      { id: 'c', text: "Reduce burn rate (extend runway, buy time)" },
+      { id: 'd', text: "Raise Series B ASAP (outspend the competition)" },
       { id: 'e', text: "Explore acquisition/partnership opportunities" }
     ]
   },
   {
     id: 3,
     type: 'choice',
-    scenario: "You're PM at 'DataFlow'. Metrics over 3 months: Month 16 ($52k MRR, 1.2% churn), Month 17 ($54k MRR, 1.8% churn), Month 18 ($56k MRR, 2.4% churn).",
-    question: "What does the rising churn trend signal?",
+    scenario: "DataFlow (data analytics). MRR is growing, but churn is trending: 1.2% → 1.8% → 2.4% over 90 days.",
+    question: "What does this rising churn trend likely signal?",
     options: [
-      { id: 'a', text: "Normal variation (not concerning)" },
-      { id: 'b', text: "Product quality is declining (bugs)" },
-      { id: 'c', text: "Market saturation in our segment" },
-      { id: 'd', text: "Pricing increase consequences" },
-      { id: 'e', text: "CAC quality decreasing (acquiring worse-fit users)" }
+      { id: 'a', text: "Normal variation (noise in the data)" },
+      { id: 'b', text: "Product quality issues or bugs" },
+      { id: 'c', text: "Market saturation in your segment" },
+      { id: 'd', text: "A recent pricing increase backfired" },
+      { id: 'e', text: "CAC quality decreasing (acquiring wrong-fit customers)" }
     ]
   },
   {
     id: 4,
     type: 'choice',
-    scenario: "You're PM at 'SwiftCode'. Series A closed ($6M raised), $42k MRR, $185k/mo burn, 17m runway, 8.5% MoM growth. LTV:CAC is 12:1.",
-    question: "Your CEO asks for the 6-month growth strategy. What do you recommend?",
+    scenario: "SwiftCode. Just raised $6M Series A. MRR: $42K, Burn: $185K/mo, LTV:CAC: 12:1 (stellar).",
+    question: "Which growth strategy for the next 6 months?",
     options: [
-      { id: 'a', text: "Product-Led Growth (PLG) only (go deep on free tier)" },
-      { id: 'b', text: "Enterprise Sales only (bigger deals, faster revenue)" },
-      { id: 'c', text: "Hybrid (diversify growth engines)" },
-      { id: 'd', text: "None (reduce burn, stay lean)" },
-      { id: 'e', text: "Other (non-conventional approach)" }
+      { id: 'a', text: "PLG only (content + virality)" },
+      { id: 'b', text: "Enterprise sales only (bigger deals)" },
+      { id: 'c', text: "Hybrid (split resources between both)" },
+      { id: 'd', text: "Stay lean (reduce burn, ignore growth for now)" }
     ]
   },
   {
     id: 5,
     type: 'choice',
-    scenario: "You're PM at 'NexGen AI'. MRR $38k, Burn $220k/mo, 8m runway. Churn is 4.5% and rising. You just got a Series B term sheet ($12M) but it requires hitting $200k MRR in 10 months.",
+    scenario: "NexGen AI. Runway: 8 months, weak unit economics. Investor offers $12M at $40M valuation, demanding $200K MRR (from $38K) in 10 months.",
     question: "What do you do?",
     options: [
       { id: 'a', text: "Take the money immediately (runway is critical)" },
-      { id: 'b', text: "Renegotiate terms (lower valuation, safer targets)" },
+      { id: 'b', text: "Renegotiate for lower valuation and safer targets" },
       { id: 'c', text: "Turn it down (fix fundamentals first)" },
-      { id: 'd', text: "Take it but be honest about risks with the investor" },
-      { id: 'e', text: "Shop for better terms with other investors" }
+      { id: 'd', text: "Take it but be transparent about risks" }
     ]
   },
   {
     id: 6,
     type: 'choice',
-    scenario: "You're PM at 'MetricsPro'. 5 engineers, 14m runway, $45k MRR. Major issues: 60% onboarding drop-off, 3 missing key integrations, new competitor with better UX.",
-    question: "You have 4 weeks for ONE sprint. What's the priority?",
+    scenario: "MetricsPro. 5 engineers, 14-month runway. Users complain: 60% onboarding drop-off, missing integrations, and a competitor with better UX.",
+    question: "One 4-week sprint. What do you prioritize?",
     options: [
-      { id: 'a', text: "Fix onboarding (reduce drop-off 60% -> 40%)" },
-      { id: 'b', text: "Add 3 integrations (address requests, increase LTV)" },
-      { id: 'c', text: "Improve UX/design (compete against entrant)" },
-      { id: 'd', text: "Hire/Train new engineers (increase capacity)" },
-      { id: 'e', text: "Focus on sales (need revenue now)" }
+      { id: 'a', text: "Fix onboarding (reduce drop-off, direct revenue impact)" },
+      { id: 'b', text: "Add 3 requested integrations (feature requests)" },
+      { id: 'c', text: "Full UX/Design overhaul (long-term advantage)" },
+      { id: 'd', text: "Hire more engineers (solve capacity problem)" }
     ]
   },
   {
     id: 7,
     type: 'choice',
-    scenario: "You're PM at 'EventFlow' ($35k MRR, 3% churn). Growth is slowing. Paths: A (Virtual events, doubles TAM, 8 weeks), B (Upmarket enterprise, 5-10x LTV, 12 weeks), C (Fix current SMB product, 4 weeks).",
-    question: "Which path do you choose?",
+    scenario: "You have 20K users. You need to decide if 'dark mode' is worth the engineering effort.",
+    question: "What's your primary research approach?",
     options: [
-      { id: 'a', text: "Expand to virtual events (Path A)" },
-      { id: 'b', text: "Go upmarket to enterprise (Path B)" },
-      { id: 'c', text: "Improve current product (Path C)" },
-      { id: 'd', text: "A + B hybrid (ambitious, risky)" },
-      { id: 'e', text: "Explore a completely different market" }
+      { id: 'a', text: "Send a survey to all 20K users asking 'Do you want it?'" },
+      { id: 'b', text: "Interview 15 power users deeply about workflow pain" },
+      { id: 'c', text: "Launch a lightweight in-app poll with email capture" },
+      { id: 'd', text: "Check analytics for night-time churn patterns" },
+      { id: 'e', text: "Ask sales what customers are asking for" }
     ]
   },
   {
     id: 8,
     type: 'choice',
-    scenario: "You're PM at 'TalentSeek' ($52k MRR, 15m runway). CEO is pitching VCs for Series B, claiming $2M ARR by month 30. Internal math says that's 25% MoM growth (3x current).",
-    question: "What's your move?",
+    scenario: "Your onboarding shows: 100 signups -> 40% Step 1 -> 20% Step 2 -> 10% Step 3 -> 8% Active. Drop-off is between Steps 2 and 3.",
+    question: "What is your first diagnostic move?",
     options: [
-      { id: 'a', text: "Support the narrative (VCs love growth projections)" },
-      { id: 'b', text: "Privately tell CEO the math doesn't work" },
-      { id: 'c', text: "Create alternate scenarios (base vs moonshot)" },
-      { id: 'd', text: "Look for a new job (this is fraud-adjacent)" },
-      { id: 'e', text: "Say nothing (CEO's problem)" }
+      { id: 'a', text: "Add tooltips to Step 3 (UX improvement)" },
+      { id: 'b', text: "Interview 20 users who dropped at the boundary" },
+      { id: 'c', text: "A/B test removing Step 3 entirely" },
+      { id: 'd', text: "Build more in-app help documentation" },
+      { id: 'e', text: "Investigate: Is Step 3 actually necessary for value?" }
     ]
   },
   {
     id: 9,
     type: 'choice',
-    scenario: "You're interviewing at 'SuccessIO'. Founded 18m ago, $150k MRR, $250k burn. CEO salary is $300k. 2 senior PMs left in 3 months. No Series B started yet.",
-    question: "What's your assessment?",
+    scenario: "Note-taking for engineers. Built: snippets, syntax. Asking for: AI Summary (12), GitHub (8), Collab (5), Search (3), Offline (2).",
+    question: "You can pick ONE to build next. Which one?",
     options: [
-      { id: 'a', text: "Great opportunity (room to optimize)" },
-      { id: 'b', text: "Red flags (concerning signals, walk away)" },
-      { id: 'c', text: "Conditional yes (if burn is reduced)" },
-      { id: 'd', text: "Wait and see (check back in 6 months)" },
-      { id: 'e', text: "No assessment (not enough info)" }
+      { id: 'a', text: "AI summarization (most requested, trendy)" },
+      { id: 'b', text: "GitHub integration (enterprise revenue signal)" },
+      { id: 'c', text: "Collaboration (TAM expansion)" },
+      { id: 'd', text: "Better search (foundational utility)" },
+      { id: 'e', text: "Offline mode (strategic moat)" }
     ]
   },
   {
     id: 10,
     type: 'choice',
-    scenario: "Compare 3 companies at Month 20. A (20% growth, 0.8% churn, 25:1 LTV:CAC), B (8% growth, 1.5% churn, 8:1 LTV:CAC), C (3% growth, 3.2% churn, 2.1:1 LTV:CAC).",
-    question: "Rank by 'most likely to succeed in 3 years'.",
+    scenario: "Your CEO tells VCs: 'We'll hit $2M ARR in 12 months.' Current: $300K ARR, 8% MoM growth. Math requires 25% MoM.",
+    question: "What's your internal move?",
     options: [
-      { id: 'a', text: "A > B > C" },
-      { id: 'b', text: "A > C > B" },
-      { id: 'c', text: "B > A > C" },
-      { id: 'd', text: "C > B > A" },
-      { id: 'e', text: "B = A > C" }
+      { id: 'a', text: "Support the narrative (CEO's vision)" },
+      { id: 'b', text: "Privately tell CEO the math doesn't work" },
+      { id: 'c', text: "Present 'Base Case' vs 'Moonshot' to the board" },
+      { id: 'd', text: "Say nothing; let the market decide" }
     ]
   },
   {
     id: 11,
-    type: 'text',
-    question: "Think about the worst product decision you made (or saw) at a startup. What was the red flag nobody paid attention to?",
+    type: 'choice',
+    scenario: "SuccessIO Interview: CEO claims 5x growth in 6mo, high burn ($250k), $300k CEO salary, 2 PMs just left.",
+    question: "What's your assessment?",
+    options: [
+      { id: 'a', text: "Great opportunity (high growth potential)" },
+      { id: 'b', text: "Major red flags; walk away immediately" },
+      { id: 'c', text: "Conditional yes (if burn is reduced)" },
+      { id: 'd', text: "Wait and see (need more data)" }
+    ]
   },
   {
     id: 12,
     type: 'hybrid',
-    question: "At Series A, what metric worries you most?",
+    scenario: "Codebase is a mess. 40% of capacity is bug fixes. Team asks for 4-sprint refactor. Runway is 14 months.",
+    question: "How do you respond?",
     options: [
-      { id: 'a', text: "Revenue growth" },
-      { id: 'b', text: "Unit economics" },
-      { id: 'c', text: "Team quality" },
-      { id: 'd', text: "Market demand" },
-      { id: 'e', text: "Competition" }
+      { id: 'a', text: "Approve the full refactor (long-term health)" },
+      { id: 'b', text: "Reject it (focus exclusively on growth)" },
+      { id: 'c', text: "Negotiate: 2-sprint refactor + 2-sprint features" },
+      { id: 'd', text: "Verify: Quantify the slowdown and bug data first" }
     ],
-    followUpPrompt: "Briefly, why did you pick that?"
+    followUpPrompt: "In one sentence, why did you choose that trade-off?"
   }
 ];
 

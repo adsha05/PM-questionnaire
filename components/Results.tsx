@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { QuizResults } from '../types';
-import { db, Peer } from '../db';
+import { db } from '../db';
 
 interface ResultsProps {
   results: QuizResults | null;
@@ -10,7 +10,7 @@ interface ResultsProps {
 }
 
 const Results: React.FC<ResultsProps> = ({ results, error, onRestart }) => {
-  const [peers, setPeers] = useState<Peer[]>([]);
+  const [peers, setPeers] = useState<any[]>([]);
 
   useEffect(() => {
     if (results?.archetype) {
@@ -185,27 +185,22 @@ const Results: React.FC<ResultsProps> = ({ results, error, onRestart }) => {
 
         {/* Next Step / CTA */}
         <div className="bg-indigo-600 rounded-3xl p-10 text-center text-white mb-12 shadow-xl shadow-indigo-100">
-          <h2 className="text-3xl font-black mb-4">Want to test your intuitions against AI?</h2>
+          <h2 className="text-3xl font-black mb-4">Level up your decision making</h2>
           <p className="text-indigo-100 font-medium mb-8 max-w-lg mx-auto leading-relaxed">
-            See how your specific product decisions compare to our specialized models in real-time.
+            Honing your product instincts is a lifelong journey. Explore advanced frameworks to sharpen your strategic thinking even further.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#" className="w-full sm:w-auto px-10 py-4 bg-white text-indigo-600 rounded-2xl font-bold hover:bg-indigo-50 transition-all transform hover:scale-105">
-              Try TriconeAI free →
-            </a>
+            <button onClick={onRestart} className="w-full sm:w-auto px-10 py-4 bg-white text-indigo-600 rounded-2xl font-bold hover:bg-indigo-50 transition-all transform hover:scale-105">
+              Retake the Challenge →
+            </button>
             <span className="text-indigo-300 text-xs font-bold uppercase tracking-widest">
-              No credit card needed
+              Sharpen your skills
             </span>
           </div>
         </div>
 
-        <div className="text-center">
-          <button 
-            onClick={onRestart}
-            className="px-10 py-4 border-2 border-slate-200 text-slate-700 rounded-2xl font-bold hover:bg-slate-50 transition-all active:scale-95"
-          >
-            Retake Challenge
-          </button>
+        <div className="text-center opacity-50">
+          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">End of Report</p>
         </div>
       </div>
     </div>
