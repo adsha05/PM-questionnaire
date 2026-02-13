@@ -19,6 +19,7 @@ export interface UserInfo {
   email: string;
   company?: string;
   website?: string;
+  turnstileToken?: string;
 }
 
 export interface UserResponse {

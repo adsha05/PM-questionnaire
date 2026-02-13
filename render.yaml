@@ -21,3 +21,11 @@ services:
         sync: false
       - key: HASH_SECRET
         generateValue: true
+      - key: ENCRYPTION_SECRET
+        generateValue: true
+      - key: TRUST_PROXY_HOPS
+        value: "1"
+      - key: VITE_TURNSTILE_SITE_KEY
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false

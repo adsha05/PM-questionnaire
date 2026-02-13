@@ -21,6 +21,8 @@ This app now uses a secure backend for:
    - `DATABASE_URL`
    - `GEMINI_API_KEY`
    - `HASH_SECRET`
+   - `ENCRYPTION_SECRET`
+   - `TRUST_PROXY_HOPS` (set `1` on Render/Railway/Fly)
 4. Start frontend + backend:
    `npm run dev`
 
@@ -35,6 +37,9 @@ Frontend runs on `http://localhost:3000`, API runs on `http://localhost:8787`.
    - `DATABASE_URL`
    - `GEMINI_API_KEY`
    - `HASH_SECRET` (long random secret)
+   - `ENCRYPTION_SECRET` (long random secret)
+   - `TRUST_PROXY_HOPS=1` (if behind one reverse proxy)
+   - Optional: `TURNSTILE_SECRET_KEY` + `VITE_TURNSTILE_SITE_KEY`
    - Optional: `ALLOWED_ORIGINS` (comma-separated)
 3. Build command:
    `npm run build`
@@ -57,12 +62,15 @@ The Node server serves both API and the built frontend (`dist/`) as a single dep
 ## Security Controls Included
 - Gemini key moved to backend
 - Request payload validation (shape, question IDs, option IDs, text limits)
-- Hidden honeypot field for bot detection
-- In-memory rate limiting by IP
-- Database throttles for repeated email/IP submissions
+- Hidden honeypot field + optional Cloudflare Turnstile verification
+- Durable database-backed throttling for IP and email burst limits
+- Duplicate-submission and daily network submission limits
+- Gemini safety limits: concurrency cap, request timeout, daily budget cap
+- PII encrypted at rest in Postgres (name/email/company)
 - Helmet security headers
+- Strict proxy-aware client IP handling via `TRUST_PROXY_HOPS`
 - Optional CORS allowlist via `ALLOWED_ORIGINS`
 
 ## Notes
-- For high-scale production, replace in-memory rate limit with Redis.
+- For very high traffic, move rate limiting from Postgres to Redis/edge WAF.
 - Do not commit `.env` files.

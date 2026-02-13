@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { UserInfo } from '../types';
 
 interface UserDetailsFormProps {
@@ -8,19 +8,104 @@ interface UserDetailsFormProps {
 }
 
 const UserDetailsForm: React.FC<UserDetailsFormProps> = ({ onSubmit, onBack }) => {
+  const turnstileSiteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY || '').trim();
+  const requiresTurnstile = turnstileSiteKey.length > 0;
+  const turnstileContainerRef = useRef<HTMLDivElement | null>(null);
+  const widgetIdRef = useRef<string | number | null>(null);
   const [formData, setFormData] = useState<UserInfo>({
     name: '',
     email: '',
     company: '',
-    website: ''
+    website: '',
+    turnstileToken: ''
   });
+  const [turnstileError, setTurnstileError] = useState<string | null>(null);
 
-  const isValid = formData.name.trim().length > 0 && 
+  const isValid = formData.name.trim().length > 0 &&
                   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
+  const canSubmit = isValid && (!requiresTurnstile || Boolean(formData.turnstileToken));
+
+  useEffect(() => {
+    if (!requiresTurnstile || !turnstileContainerRef.current) return;
+
+    let cancelled = false;
+    const scriptId = 'turnstile-script';
+
+    const renderWidget = () => {
+      if (cancelled || !turnstileContainerRef.current || !window.turnstile) return;
+      if (widgetIdRef.current !== null) {
+        window.turnstile.remove(widgetIdRef.current);
+      }
+      widgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
+        sitekey: turnstileSiteKey,
+        theme: 'light',
+        callback: (token: string) => {
+          setTurnstileError(null);
+          setFormData((prev) => ({ ...prev, turnstileToken: token }));
+        },
+        'expired-callback': () => {
+          setFormData((prev) => ({ ...prev, turnstileToken: '' }));
+        },
+        'error-callback': () => {
+          setFormData((prev) => ({ ...prev, turnstileToken: '' }));
+          setTurnstileError('Security check failed. Please refresh and retry.');
+        }
+      });
+    };
+
+    if (window.turnstile) {
+      renderWidget();
+      return () => {
+        cancelled = true;
+        if (window.turnstile && widgetIdRef.current !== null) {
+          window.turnstile.remove(widgetIdRef.current);
+          widgetIdRef.current = null;
+        }
+      };
+    }
+
+    let script = document.getElementById(scriptId) as HTMLScriptElement | null;
+    const onLoad = () => {
+      if (script) script.dataset.loaded = 'true';
+      renderWidget();
+    };
+
+    const onError = () => {
+      setTurnstileError('Could not load security verification. Please refresh and try again.');
+    };
+
+    if (!script) {
+      script = document.createElement('script');
+      script.id = scriptId;
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async = true;
+      script.defer = true;
+      script.addEventListener('load', onLoad);
+      script.addEventListener('error', onError);
+      document.head.appendChild(script);
+    } else if (script.dataset.loaded === 'true') {
+      renderWidget();
+    } else {
+      script.addEventListener('load', onLoad);
+      script.addEventListener('error', onError);
+    }
+
+    return () => {
+      cancelled = true;
+      if (script) {
+        script.removeEventListener('load', onLoad);
+        script.removeEventListener('error', onError);
+      }
+      if (window.turnstile && widgetIdRef.current !== null) {
+        window.turnstile.remove(widgetIdRef.current);
+        widgetIdRef.current = null;
+      }
+    };
+  }, [requiresTurnstile, turnstileSiteKey]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isValid) {
+    if (canSubmit) {
       onSubmit(formData);
     }
   };
@@ -89,11 +174,21 @@ const UserDetailsForm: React.FC<UserDetailsFormProps> = ({ onSubmit, onBack }) =
           />
         </div>
 
+        {requiresTurnstile && (
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Security Check *</label>
+            <div ref={turnstileContainerRef} />
+            {turnstileError && (
+              <p className="mt-2 text-sm text-rose-600 font-semibold">{turnstileError}</p>
+            )}
+          </div>
+        )}
+
         <button
           type="submit"
-          disabled={!isValid}
+          disabled={!canSubmit}
           className={`w-full py-5 rounded-2xl text-lg font-bold transition-all shadow-lg 
-            ${isValid 
+            ${canSubmit 
               ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200 transform hover:scale-[1.01] active:scale-95' 
               : 'bg-slate-100 text-slate-400 cursor-not-allowed'
             }`}

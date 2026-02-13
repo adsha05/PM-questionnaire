@@ -36,6 +36,7 @@ export const db = {
       },
       responses,
       honeypot: info.website || '',
+      turnstileToken: info.turnstileToken || '',
     };
 
     const data = await apiRequest<{ results: QuizResults }>('/api/submissions', {
