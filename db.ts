@@ -1,63 +1,66 @@
 
 import { UserInfo, UserResponse, QuizResults } from './types';
 
-// Seeded "historical" data to represent the 200+ PMs
-const SEEDED_PEERS = [
-  { name: "Alex K.", company: "Stripe", archetype: "The Scale Realist" },
-  { name: "Sarah M.", company: "Airbnb", archetype: "The User Empath" },
-  { name: "Jordan T.", company: "Notion", archetype: "The Analytical Pragmatist" },
-  { name: "Chen W.", company: "DoorDash", archetype: "The Growth Hacker" },
-  { name: "Elena R.", company: "Revolut", archetype: "The Scale Realist" },
-  { name: "Marcus L.", company: "Linear", archetype: "The Visionary Architect" },
-];
+export interface Peer {
+  name: string;
+  company: string;
+  archetype: string;
+}
+
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(init?.headers || {}),
+    },
+  });
+
+  const json = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message = typeof json?.error === 'string' ? json.error : 'Request failed.';
+    throw new Error(message);
+  }
+  return json as T;
+}
 
 export const db = {
-  saveSubmission: async (info: UserInfo, responses: UserResponse[], results: QuizResults): Promise<void> => {
-    try {
-      await new Promise(resolve => setTimeout(resolve, 800)); // Simulate latency
+  saveSubmission: async (info: UserInfo, responses: UserResponse[]): Promise<QuizResults> => {
+    const payload = {
+      userInfo: {
+        name: info.name,
+        email: info.email,
+        company: info.company || 'Private',
+      },
+      responses,
+      honeypot: info.website || '',
+    };
 
-      const submission = {
-        id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
-        user: {
-          name: info.name,
-          email: info.email,
-          company: info.company || 'Private'
-        },
-        responses,
-        results
-      };
-
-      const existing = JSON.parse(localStorage.getItem('pm_gauntlet_submissions') || '[]');
-      existing.push(submission);
-      localStorage.setItem('pm_gauntlet_submissions', JSON.stringify(existing));
-      
-      console.log('Submission persisted locally:', submission);
-    } catch (error) {
-      console.error('Database Error:', error);
-      throw error;
-    }
+    const data = await apiRequest<{ results: QuizResults }>('/api/submissions', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return data.results;
   },
 
   getSubmissionsCount: async (): Promise<number> => {
-    const existing = JSON.parse(localStorage.getItem('pm_gauntlet_submissions') || '[]');
-    return 200 + existing.length;
+    try {
+      const data = await apiRequest<{ totalSubmissions: number }>('/api/stats');
+      return data.totalSubmissions;
+    } catch {
+      return 200;
+    }
   },
 
-  getPeersByArchetype: async (archetype: string): Promise<any[]> => {
-    // Combine seeded peers with any real submissions from localStorage
-    const local = JSON.parse(localStorage.getItem('pm_gauntlet_submissions') || '[]');
-    const localPeers = local
-      .filter((s: any) => s.results.archetype === archetype)
-      .map((s: any) => ({
-        name: s.user.name.split(' ')[0] + ' ' + (s.user.name.split(' ')[1]?.[0] || '') + '.',
-        company: s.user.company,
-        archetype: s.results.archetype
-      }));
-
-    const seededMatches = SEEDED_PEERS.filter(p => p.archetype === archetype);
-    
-    // Return a mix, up to 4
-    return [...localPeers, ...seededMatches].slice(0, 4);
+  getPeersByArchetype: async (archetype: string): Promise<Peer[]> => {
+    try {
+      const encodedArchetype = encodeURIComponent(archetype);
+      const data = await apiRequest<{ peers: Peer[] }>(`/api/peers?archetype=${encodedArchetype}`);
+      return data.peers;
+    } catch {
+      return [];
+    }
   }
 };

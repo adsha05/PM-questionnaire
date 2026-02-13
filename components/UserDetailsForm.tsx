@@ -11,7 +11,8 @@ const UserDetailsForm: React.FC<UserDetailsFormProps> = ({ onSubmit, onBack }) =
   const [formData, setFormData] = useState<UserInfo>({
     name: '',
     email: '',
-    company: ''
+    company: '',
+    website: ''
   });
 
   const isValid = formData.name.trim().length > 0 && 
@@ -73,6 +74,18 @@ const UserDetailsForm: React.FC<UserDetailsFormProps> = ({ onSubmit, onBack }) =
             placeholder="Acme Corp"
             value={formData.company}
             onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+          />
+        </div>
+
+        <div className="hidden" aria-hidden="true">
+          <label htmlFor="website">Website</label>
+          <input
+            type="text"
+            id="website"
+            tabIndex={-1}
+            autoComplete="off"
+            value={formData.website || ''}
+            onChange={(e) => setFormData({ ...formData, website: e.target.value })}
           />
         </div>
 

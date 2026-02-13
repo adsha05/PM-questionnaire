@@ -18,40 +18,52 @@ const Quiz: React.FC<QuizProps> = ({ questions, onComplete }) => {
 
   const getResponse = (id: number) => responses.find(r => r.questionId === id);
 
-  const updateResponse = (data: Partial<UserResponse>) => {
-    const newResponses = [...responses];
-    const index = newResponses.findIndex(r => r.questionId === currentQuestion.id);
+  const upsertResponse = (
+    baseResponses: UserResponse[],
+    questionId: number,
+    data: Partial<UserResponse>
+  ) => {
+    const newResponses = [...baseResponses];
+    const index = newResponses.findIndex(r => r.questionId === questionId);
     if (index > -1) {
       newResponses[index] = { ...newResponses[index], ...data };
     } else {
-      newResponses.push({ questionId: currentQuestion.id, ...data });
+      newResponses.push({ questionId, ...data });
     }
-    setResponses(newResponses);
+    return newResponses;
   };
 
   const handleSelect = (optionId: string) => {
-    updateResponse({ selectedOptionId: optionId });
+    setResponses(prev => upsertResponse(prev, currentQuestion.id, { selectedOptionId: optionId }));
     if (currentQuestion.type === 'choice') {
-      setTimeout(handleNext, 400);
+      setTimeout(() => handleNext(optionId), 400);
     }
   };
 
-  const handleNext = () => {
+  const handleNext = (forcedSelection?: string) => {
+    const selectedOption = forcedSelection || currentSelection;
+    const responsePatch: Partial<UserResponse> = {
+      ...(selectedOption ? { selectedOptionId: selectedOption } : {})
+    };
+
     if (currentQuestion.type === 'text') {
-      updateResponse({ textValue: currentText });
+      responsePatch.textValue = currentText.trim();
     }
     if (currentQuestion.type === 'hybrid' && currentQuestion.followUpPrompt) {
-      updateResponse({ followUpValue: currentFollowUp });
+      responsePatch.followUpValue = currentFollowUp.trim();
     }
+
+    const nextResponses = upsertResponse(responses, currentQuestion.id, responsePatch);
+    setResponses(nextResponses);
 
     if (currentIndex < questions.length - 1) {
       const nextQ = questions[currentIndex + 1];
-      const nextRes = responses.find(r => r.questionId === nextQ.id);
+      const nextRes = nextResponses.find(r => r.questionId === nextQ.id);
       setCurrentText(nextRes?.textValue || '');
       setCurrentFollowUp(nextRes?.followUpValue || '');
       setCurrentIndex(currentIndex + 1);
     } else {
-      onComplete(responses);
+      onComplete(nextResponses);
     }
   };
 

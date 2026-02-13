@@ -18,6 +18,7 @@ export interface UserInfo {
   name: string;
   email: string;
   company?: string;
+  website?: string;
 }
 
 export interface UserResponse {

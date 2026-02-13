@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { QuizResults } from '../types';
-import { db } from '../db';
+import { db, Peer } from '../db';
 
 interface ResultsProps {
   results: QuizResults | null;
@@ -10,7 +10,7 @@ interface ResultsProps {
 }
 
 const Results: React.FC<ResultsProps> = ({ results, error, onRestart }) => {
-  const [peers, setPeers] = useState<any[]>([]);
+  const [peers, setPeers] = useState<Peer[]>([]);
 
   useEffect(() => {
     if (results?.archetype) {
