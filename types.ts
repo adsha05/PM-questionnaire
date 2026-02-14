@@ -44,6 +44,5 @@ export enum AppState {
   WELCOME = 'WELCOME',
   DETAILS = 'DETAILS',
   QUIZ = 'QUIZ',
-  ANALYZING = 'ANALYZING',
-  RESULTS = 'RESULTS'
+  THANK_YOU = 'THANK_YOU'
 }

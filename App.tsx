@@ -1,21 +1,17 @@
 
 import React, { useState, useCallback } from 'react';
-import { AppState, UserResponse, QuizResults, UserInfo } from './types';
+import { AppState, UserResponse, UserInfo } from './types';
 import { QUIZ_QUESTIONS } from './constants';
-import { analyzePMInstincts } from './geminiService';
 import { db } from './db';
 import Welcome from './components/Welcome';
 import UserDetailsForm from './components/UserDetailsForm';
 import Quiz from './components/Quiz';
-import Results from './components/Results';
-import Loading from './components/Loading';
+import ThankYou from './components/ThankYou';
 
 const App: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<AppState>(AppState.WELCOME);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [responses, setResponses] = useState<UserResponse[]>([]);
-  const [results, setResults] = useState<QuizResults | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const startDetails = () => setCurrentStep(AppState.DETAILS);
   const backToWelcome = () => setCurrentStep(AppState.WELCOME);
@@ -27,28 +23,21 @@ const App: React.FC = () => {
 
   const handleQuizComplete = useCallback(async (finalResponses: UserResponse[]) => {
     setResponses(finalResponses);
-    setCurrentStep(AppState.ANALYZING);
     try {
-      const analysis = await analyzePMInstincts(finalResponses, userInfo?.name);
-      
-      // Save to "Database"
+      // Save to "Database" - passing null for results as Gemini is removed
       if (userInfo) {
-        await db.saveSubmission(userInfo, finalResponses, analysis);
+        await db.saveSubmission(userInfo, finalResponses, null as any);
       }
-
-      setResults(analysis);
-      setCurrentStep(AppState.RESULTS);
+      setCurrentStep(AppState.THANK_YOU);
     } catch (err) {
       console.error(err);
-      setError("Something went wrong analyzing your instincts. Maybe the AI is jealous? Try again.");
-      setCurrentStep(AppState.RESULTS);
+      // Even on error, we proceed to Thank You as the user has finished their part
+      setCurrentStep(AppState.THANK_YOU);
     }
   }, [userInfo]);
 
   const restart = () => {
     setResponses([]);
-    setResults(null);
-    setError(null);
     setUserInfo(null);
     setCurrentStep(AppState.WELCOME);
   };
@@ -71,23 +60,15 @@ const App: React.FC = () => {
           />
         )}
 
-        {currentStep === AppState.ANALYZING && (
-          <Loading />
-        )}
-
-        {currentStep === AppState.RESULTS && (
-          <Results 
-            results={results} 
-            error={error} 
-            onRestart={restart} 
-          />
+        {currentStep === AppState.THANK_YOU && (
+          <ThankYou onRestart={restart} />
         )}
       </div>
       
       <footer className="mt-8 text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2 opacity-50">
-        <span>PM Instincts Gauntlet v1.0</span>
+        <span>PM Decision Challenge</span>
         <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-        <span>Powered by Gemini 3 Pro</span>
+        <span>Educational Resource</span>
       </footer>
     </div>
   );
