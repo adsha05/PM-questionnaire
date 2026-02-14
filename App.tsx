@@ -24,14 +24,12 @@ const App: React.FC = () => {
   const handleQuizComplete = useCallback(async (finalResponses: UserResponse[]) => {
     setResponses(finalResponses);
     try {
-      // Save to "Database" - passing null for results as Gemini is removed
       if (userInfo) {
         await db.saveSubmission(userInfo, finalResponses, null as any);
       }
       setCurrentStep(AppState.THANK_YOU);
     } catch (err) {
       console.error(err);
-      // Even on error, we proceed to Thank You as the user has finished their part
       setCurrentStep(AppState.THANK_YOU);
     }
   }, [userInfo]);
@@ -43,8 +41,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 bg-white sm:bg-slate-50">
-      <div className="w-full max-w-4xl bg-white sm:rounded-[2.5rem] sm:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)] overflow-hidden sm:border sm:border-slate-100 transition-all duration-500">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 bg-slate-50 overflow-hidden">
+      <div className="w-full max-w-6xl bg-white sm:rounded-[3rem] shadow-[0_30px_70px_-15px_rgba(0,0,0,0.1)] overflow-hidden border border-slate-100 transition-all duration-500 min-h-[700px] flex flex-col">
         {currentStep === AppState.WELCOME && (
           <Welcome onStart={startDetails} />
         )}
@@ -54,10 +52,12 @@ const App: React.FC = () => {
         )}
 
         {currentStep === AppState.QUIZ && (
-          <Quiz 
-            questions={QUIZ_QUESTIONS} 
-            onComplete={handleQuizComplete} 
-          />
+          <div className="flex-grow overflow-hidden">
+            <Quiz 
+              questions={QUIZ_QUESTIONS} 
+              onComplete={handleQuizComplete} 
+            />
+          </div>
         )}
 
         {currentStep === AppState.THANK_YOU && (
@@ -65,10 +65,10 @@ const App: React.FC = () => {
         )}
       </div>
       
-      <footer className="mt-8 text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2 opacity-50">
+      <footer className="mt-8 text-slate-400 text-[10px] font-bold uppercase tracking-[0.4em] flex items-center gap-4 opacity-50 shrink-0">
         <span>PM Decision Challenge</span>
-        <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-        <span>Educational Resource</span>
+        <span className="w-1.5 h-1.5 bg-slate-300 rounded-full"></span>
+        <span>Educational Framework v1.0</span>
       </footer>
     </div>
   );
